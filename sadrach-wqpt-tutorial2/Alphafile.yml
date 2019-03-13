@@ -1,0 +1,7 @@
+runtimeVersion: 1.0
+
+alpha:
+  name: sadrach-wqpt-tutorial2
+  playbook: wqp-tutorial-20190304
+  runtime: python3.7
+  entrypoint: wqpt-tutorial
