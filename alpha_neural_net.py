@@ -19,7 +19,9 @@ seed = numpy.random.seed(7)
 import numpy as np
 from wqpt import predict, fit, set_state
 from sklearn.preprocessing import MinMaxScaler
-
+from sklearn.model_selection import cross_val_score
+from sklearn.model_selection import KFold
+from sklearn.pipeline import Pipeline
 
 pd.set_option('display.max_rows', 10000)
 pd.set_option('display.max_columns', 100)
@@ -51,8 +53,8 @@ class Alpha:
         self.model = Sequential()
         self.model.add(Dense(input_neurons, kernel_initializer='normal', input_dim=3, activation='relu'))
         for i in range(1, number_of_layers):
-            self.model.add(Dense(8, activation='relu'))
-        self.model.add(Dense(1, activation='linear'))
+            self.model.add(Dense(128, kernel_initializer='normal', activation='relu'))
+        self.model.add(Dense(1, kernel_initializer='normal', activation='linear'))
         self.model.compile(loss='mape', optimizer='adam', metrics=['mape'])
         return self.model 
     def set_state(self, date):
@@ -68,8 +70,8 @@ class Alpha:
         scalar = MinMaxScaler()
         scalar.fit(X)
         X = scalar.transform(X)
-        model = self.build_neural_network(12, 10)
-        reg = model.fit(X, y, epochs=500, batch_size=10)
+        model = self.build_neural_network(128, 3)
+        reg = model.fit(X, y, validation_split = 0.2, epochs=2200, batch_size=10)
         self.models['reg'] = reg
     def predict(self, list_price, discount_percentage, date):
         START_DATE = date_mapper('02/07/2016')
@@ -160,6 +162,7 @@ def main():
     y_pred = ALPHA_INSTANCE.model.predict(x_pred)
     error_value = ALPHA_INSTANCE.mean_absolute_percentage_error(y_true[0], y_pred[0])
     print("Mean Absolute Percent Error (MAPE) is: ",  error_value)
+
     
 if __name__ == '__main__':
     main()
